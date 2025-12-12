@@ -23,7 +23,7 @@ namespace WebApplication1.Controllers
             return Ok(products);
         }
 
-       
+        [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProductById(string id)
         {
             var product = await _context.Products.FindAsync(id);

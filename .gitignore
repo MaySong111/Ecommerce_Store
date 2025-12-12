@@ -483,3 +483,4 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 backend/WebApplication1/appsettings.json
+frontend/README.md
