@@ -20,32 +20,36 @@ export async function getProduct(id) {
   return result.json();
 }
 
-// export async function createProduct(product) {
-//   var response = await fetch(`${BASE_URL}/activities`, {
-//     headers: getAuthHeaders(),
-//     method: "POST",
-//     body: JSON.stringify(activity),
-//   });
+export async function createProduct(product) {
+  var response = await fetch(`${BASE_URL}/products`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify(product),
+  });
 
-//   if (response.status === 401) {
-//     const error = new Error("Unauthorized");
-//     error.status = 401;
-//     throw error;
-//   }
-//   return response.json();
-// }
+  if (response.status === 401) {
+    const error = new Error("Unauthorized");
+    error.status = 401;
+    throw error;
+  }
+  return response.json();
+}
 
-// export async function updateActivity(id, activity) {
-//   var result = await fetch(`${BASE_URL}/activities/${id}`, {
-//     method: "PUT",
-//     headers: getAuthHeaders(),
-//     body: JSON.stringify(activity),
-//   });
-//   if (!result.ok) {
-//     throw new Error("Update failed");
-//   }
-//   return result.json();
-// }
+export async function updateProduct(id, product) {
+  var result = await fetch(`${BASE_URL}/products/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(product),
+  });
+  if (!result.ok) {
+    throw new Error("Update failed");
+  }
+  return result.json();
+}
 
 // export async function deleteActivity(id) {
 //   var result = await fetch(`${BASE_URL}/activities/${id}`, {

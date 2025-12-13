@@ -10,10 +10,15 @@ import Unauthorized from "./pages/public/Unauthorized";
 import NotFound from "./pages/public/NotFound";
 import Layout from "./components/Layout";
 import { CssBaseline } from "@mui/material";
+import { Toaster } from "react-hot-toast";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export default function App() {
   return (
-    <div>
+    <QueryClientProvider client={queryClient}>
+      <Toaster position="top-right" reverseOrder={false} />
       <CssBaseline />
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -29,6 +34,6 @@ export default function App() {
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </div>
+    </QueryClientProvider>
   );
 }

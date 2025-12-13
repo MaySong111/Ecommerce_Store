@@ -1,23 +1,10 @@
-import { useEffect, useState } from "react";
-import { getProducts } from "../http";
 import ProductCard from "../components/ProductCard";
 import { Box, Button, Container, Typography } from "@mui/material";
+import { useProducts } from "../hooks/useProducts";
 
 export default function ProductListPage() {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getProducts();
-        // console.log(data);
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-    fetchProducts();
-  }, []);
+  const { products, isProductsLoading } = useProducts();
+  if (isProductsLoading || !products) return <div>Loading...</div>;
 
   return (
     <Container maxWidth="xl">

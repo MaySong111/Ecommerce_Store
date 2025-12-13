@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { getProduct } from "../http";
+import { useParams } from "react-router-dom";
 import {
   Button,
   Divider,
@@ -13,24 +11,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useProducts } from "../hooks/useProducts";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const [product, setProduct] = useState(null);
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const data = await getProduct(id);
-        setProduct(data);
-      } catch (error) {
-        console.error("Error fetching product:", error);
-      }
-    };
-    fetchProduct();
-  }, [id]);
-
-  if (!product) return <div>Loading...</div>;
+  const { product, isProductLoading } = useProducts(id);
+  if (isProductLoading || !product) return <div>Loading...</div>;
 
   const productDetails = [
     { label: "Name", value: product.name },
@@ -98,8 +84,7 @@ export default function ProductDetailPage() {
               color="primary"
               variant="contained"
               fullWidth
-              component={Link}
-              to="#"
+              onClick={() => {}}
             >
               Add to Basket
             </Button>
