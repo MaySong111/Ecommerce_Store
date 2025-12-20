@@ -1,33 +1,37 @@
-import { Navigate } from "react-router-dom";
 import { loginUser, registerUser } from "../api/http";
 import { useMutation } from "@tanstack/react-query";
 import useAuthStore from "../store/useAuthStore";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function useAccount() {
   const login = useAuthStore((state) => state.login);
 
+  const redirect = useNavigate();
+
   const loginMutation = useMutation({
     mutationFn: loginUser,
-
     onSuccess: (result) => {
       // console.log("Login successful:", result);
-      const { token, userInfo, message } = result;
+      const { token, userInfo } = result;
       // store the token and user info
       login(userInfo, token);
-      // toast
-      toast.success(message);
       // redirect to activities page
-      Navigate("/activities");
+      redirect("/products");
+    },
+    onError: (error) => {
+      console.error("Login failed:", error);
+      toast.error(error.message || "Login failed");
     },
   });
 
   const registerMutation = useMutation({
     mutationFn: registerUser,
-    onSuccess: (result) => {
-      console.log(result);
-      // toast
-      Navigate("/login");
+    onSuccess: () => {
+      redirect("/login");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Registration failed");
     },
   });
 

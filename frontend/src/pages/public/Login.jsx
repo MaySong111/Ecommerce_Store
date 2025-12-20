@@ -15,8 +15,8 @@ export default function Login() {
   const { loginMutation } = useAccount();
   const [formData, setFormData] = useState({
     email: "",
+    username: "",
     password: "",
-    rememberMe: false,
   });
 
   const [errors, setErrors] = useState({});
@@ -115,10 +115,9 @@ export default function Login() {
             type="submit"
             fullWidth
             variant="contained"
-            disabled={loginMutation.isPending}
             sx={{ mt: 3, mb: 2 }}
           >
-            {loginMutation.isPending ? "Logging in..." : "Login"}
+            LOGIN
           </Button>
           <Typography variant="body2" align="center">
             Don't have an account?

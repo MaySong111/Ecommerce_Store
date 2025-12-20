@@ -24,14 +24,16 @@ namespace WebApplication1.Controllers
             // 2. create new user
             var newUser = new User
             {
-                Email = dto.Email
+                Email = dto.Email,
+                UserName = dto.UserName
             };
 
             // 3. save user to database
             var result = await userManager.CreateAsync(newUser, dto.Password);
+
             if (!result.Succeeded)
             {
-                return BadRequest(new { Message = "User registration failed." });
+                return BadRequest(new { Message = "User registration failed.", Errors = result.Errors });
             }
             // 4. add a default user role to all new users
             await userManager.AddToRoleAsync(newUser, "MEMBER");
@@ -47,14 +49,14 @@ namespace WebApplication1.Controllers
             // 邮箱不存在 = 身份验证失败并不是找不到用户(所以不是NotFound),而是Unauthorized401
             if (user == null)
             {
-                return Unauthorized();
+                return NotFound(new { Message = "User does not exist." });
             }
             // 2. check password
             var passwordValid = await userManager.CheckPasswordAsync(user, dto.Password);
             // 密码错误 = 身份验证失败401 Unauthorized
             if (!passwordValid)
             {
-                return Unauthorized();
+                return BadRequest(new { Message = "Invalid password." });
             }
             else
             {
@@ -64,10 +66,10 @@ namespace WebApplication1.Controllers
                 // 3.2 get the role of user
                 var userRoles = await userManager.GetRolesAsync(user);
                 string userRole = userRoles.FirstOrDefault() ?? "MEMBER";
+
                 // 3.3 create response DTO
                 return Ok(new AccountResponseDto
                 {
-                    IsSuccess = true,
                     Message = "Login successful.",
                     Token = token,
                     UserInfo = new UserInfoDto

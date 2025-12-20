@@ -8,13 +8,14 @@ import {
   IconButton,
   Badge,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import useBasket from "../hooks/useBasket";
+import useAuthStore from "../store/useAuthStore";
 
 const pages = [
   { label: "Products", path: "/products" },
@@ -25,13 +26,13 @@ const pages = [
 export default function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
   const { totalCount } = useBasket();
+  const redirect = useNavigate();
 
-  //   const token = useAuthStore((state) => state.token);
-  //   const user = useAuthStore((state) => state.user);
-  //   const logout = useAuthStore((state) => state.logout);
-  //   const isLoginedIn = !!token;
-  const isLoginedIn = false;
-  //
+  const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const isLoginedIn = Boolean(token && user);
+
   return (
     <AppBar position="static">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between", px: 3 }}>
@@ -98,11 +99,11 @@ export default function Navbar() {
               {/* user avatar */}
               <Avatar
                 src={"/default-avatar.png"}
-                alt={"bob"}
+                alt={user?.userName}
                 sx={{ cursor: "pointer" }}
               />
               {/*  username */}
-              <Typography>{"bob"}</Typography>
+              <Typography>{user?.userName}</Typography>
 
               {/* dropdown menu */}
               {showMenu && (
@@ -121,7 +122,7 @@ export default function Navbar() {
                 >
                   <Button
                     component={Link}
-                    to={`/profiles/${null}`}
+                    to={`/profiles/${user.userName}`}
                     sx={{
                       justifyContent: "flex-start",
                       width: "100%",
@@ -137,6 +138,10 @@ export default function Navbar() {
                     <PersonIcon sx={{ mr: 1 }} /> My Profile
                   </Button>
                   <Button
+                    onClick={() => {
+                      logout();
+                      redirect("/login");
+                    }}
                     sx={{
                       justifyContent: "flex-start",
                       width: "100%",

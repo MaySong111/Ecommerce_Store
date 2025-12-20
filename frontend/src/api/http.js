@@ -47,37 +47,38 @@ export async function updateProduct(id, product) {
 //  auth api--------------------------------------------------------------
 
 export async function loginUser(data) {
-  var response = await fetch(`${BASE_URL}/auth/login`, {
+  const url = `${BASE_URL}/Account/login`;
+  var response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
+  const responseData = await response.json();
+
   if (!response.ok) {
-    throw new Error("Login failed");
+    throw new Error(responseData.message || "Login failed");
   }
-  if (response.status === 401) {
-    // Token 过期或无效，清除并跳转到登录页
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-  }
-  return response.json();
+
+  return responseData;
 }
 
 export async function registerUser(data) {
-  var response = await fetch(`${BASE_URL}/auth/register`, {
+  const url = `${BASE_URL}/Account/register`;
+  var response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
+  const responseData = await response.json();
+
   if (!response.ok) {
-    throw new Error("Registration failed");
+    throw new Error(responseData.message || "Registration failed");
   }
-  return response.json();
+  return responseData;
 }
 
 // basket api--------------------------------------------------------------

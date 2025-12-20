@@ -7,9 +7,8 @@ namespace WebApplication1.Core.Dtos
 {
     public class AccountResponseDto
     {
-        public bool IsSuccess { get; set; }
         public string Message { get; set; }
-        public string Token { get; set; }
-        public UserInfoDto UserInfo { get; set; }
+        public string? Token { get; set; }
+        public UserInfoDto? UserInfo { get; set; }
     }
 }
