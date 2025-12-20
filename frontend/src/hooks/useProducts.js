@@ -40,8 +40,8 @@ export function useProducts(id = null) {
       toast.success("Successfully updated product!");
     },
     onError: (error) => {
-      console.error("Error creating product:", error);
-      toast.error("Failed to create product.");
+      console.error("Error updating product:", error);
+      toast.error("Failed to update product.");
     },
   });
 
@@ -50,7 +50,7 @@ export function useProducts(id = null) {
     product,
     isProductLoading,
     isProductsLoading,
-    createProduct: createProductMutation,
-    updateProduct: updateProductMutation,
+    createProduct: createProductMutation.mutate,
+    updateProduct: updateProductMutation.mutate,
   };
 }

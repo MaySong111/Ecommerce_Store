@@ -7,8 +7,11 @@ import {
 } from "@mui/material";
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
+import useBasket from "../hooks/useBasket";
 
 export default function ProductCard({ product }) {
+  const { addBasketItemMutation } = useBasket();
+  
   return (
     <Card
       elevation={3}
@@ -39,7 +42,17 @@ export default function ProductCard({ product }) {
         </Typography>
       </CardContent>
       <CardActions sx={{ justifyContent: "space-between" }}>
-        <Button size="small" color="primary">
+        <Button
+          size="small"
+          color="primary"
+          onClick={() => {
+            // console.log("adding to basket", product.id);
+            addBasketItemMutation.mutate({
+              productId: product.id,
+              quantity: 1,
+            });
+          }}
+        >
           Add to Cart
         </Button>
         <Button

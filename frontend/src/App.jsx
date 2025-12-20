@@ -12,6 +12,8 @@ import Layout from "./components/Layout";
 import { CssBaseline } from "@mui/material";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import BasketPage from "./pages/BasketPage";
+import CheckoutPage from "./pages/CheckoutPage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +32,8 @@ export default function App() {
           <Route path="/products" element={<ProductListPage />} />
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/basket" element={<BasketPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
         </Route>
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="*" element={<NotFound />} />

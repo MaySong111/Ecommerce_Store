@@ -12,10 +12,12 @@ import {
   Typography,
 } from "@mui/material";
 import { useProducts } from "../hooks/useProducts";
+import useBasket from "../hooks/useBasket";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const { product, isProductLoading } = useProducts(id);
+  const { addBasketItemMutation } = useBasket();
   if (isProductLoading || !product) return <div>Loading...</div>;
 
   const productDetails = [
@@ -67,14 +69,10 @@ export default function ProductDetailPage() {
             <TextField
               variant="outlined"
               type="number"
-              label="Quantity in basket"
+              label="Quantity in cart"
               fullWidth
               defaultValue={1}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+              inputProps={{ min: 1, max: product.quantityInStock }}
             />
           </Grid2>
           <Grid2 size={6}>
@@ -84,9 +82,11 @@ export default function ProductDetailPage() {
               color="primary"
               variant="contained"
               fullWidth
-              onClick={() => {}}
+              onClick={() =>
+                addBasketItemMutation.mutate({ productId: product.id })
+              }
             >
-              Add to Basket
+              Add to Cart
             </Button>
           </Grid2>
         </Grid2>

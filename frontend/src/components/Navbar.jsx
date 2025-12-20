@@ -6,14 +6,15 @@ import {
   Avatar,
   Typography,
   IconButton,
+  Badge,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-// import useAuthStore from "../store/useAuthStore";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import useBasket from "../hooks/useBasket";
 
 const pages = [
   { label: "Products", path: "/products" },
@@ -23,6 +24,8 @@ const pages = [
 
 export default function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
+  const { totalCount } = useBasket();
+
   //   const token = useAuthStore((state) => state.token);
   //   const user = useAuthStore((state) => state.user);
   //   const logout = useAuthStore((state) => state.logout);
@@ -70,10 +73,17 @@ export default function Navbar() {
         {/* 右侧登录 / 用户菜单 */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 3, mr: 2 }}>
           {/* shopping cart */}
-          <IconButton aria-label="cart" sx={{ mr: 4 }}>
-            <ShoppingCartIcon fontSize="large" />
+          <IconButton
+            aria-label="cart"
+            component={Link}
+            to="/basket"
+            sx={{ color: "inherit", mr: 3 }}
+            size="large"
+          >
+            <Badge badgeContent={totalCount} color="secondary">
+              <ShoppingCartIcon fontSize="large" />
+            </Badge>
           </IconButton>
-
           {isLoginedIn ? (
             <Box
               sx={{
