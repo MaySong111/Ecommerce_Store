@@ -5,7 +5,9 @@ namespace WebApplication1.Core.Entities
         public int Id { get; set; }
         public required string BasketPublicId { get; set; }
         public List<BasketItem> BasketItems { get; set; } = [];
-
+        public string?  ClientSecret { get; set; }
+        public string? PaymentIntentId { get; set; }
+        
 
         // methods
         // +: add item      

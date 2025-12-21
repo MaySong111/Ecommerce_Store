@@ -15,7 +15,6 @@ export default function Login() {
   const { loginMutation } = useAccount();
   const [formData, setFormData] = useState({
     email: "",
-    username: "",
     password: "",
   });
 
@@ -23,10 +22,12 @@ export default function Login() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: type === "checkbox" ? checked : value,
     }));
+    
     if (errors[name]) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -35,27 +36,28 @@ export default function Login() {
     }
   };
 
+  // this function return boolean
   const validate = () => {
     const newErrors = {};
+    // check for empty fields
     if (formData.email.trim() === "" || formData.password.trim() === "")
-      alert("Email and Password cannot be null");
+      alert("Email and Password are required.");
 
-    if (!formData.email.includes("@"))
+    // only check email format if email is not empty
+    if (formData.email.trim() && !formData.email.includes("@"))
       newErrors.email = "Invalid email address";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
+    // only check password length if password is not empty
+    if (formData.password.trim() && formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  // console.log("Current formData:", formData);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // only send login request if validation passes
     if (validate()) {
       loginMutation.mutate({
         email: formData.email,

@@ -50,6 +50,7 @@ export default function Register() {
         </Box>
 
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+         
           {/* Display name 字段 */}
           <TextField
             fullWidth
@@ -58,7 +59,7 @@ export default function Register() {
             label="User name"
             autoComplete="username"
           />
-          {/* Email 字段 */}
+           {/* Email 字段 */}
           <TextField
             fullWidth
             margin="normal"

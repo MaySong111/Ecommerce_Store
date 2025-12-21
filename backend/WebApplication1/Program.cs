@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApplication1.Core.AppContext;
 using WebApplication1.Core.AutoMappingConfig;
 using WebApplication1.Core.Entities;
+using WebApplication1.Core.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,7 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddScoped<JwtTokenCreator>();
+builder.Services.AddScoped<PaymentsService>();
 
 if (builder.Environment.IsDevelopment())
 {
