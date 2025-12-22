@@ -6,20 +6,28 @@ import {
   TextField,
   Paper,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import useBasket from "../hooks/useBasket";
+import { discount } from "../api/http";
 
-export default function OrderSummary({ basket }) {
-  const { totalCount } = useBasket();
+export default function OrderSummary() {
+
+
+  const location = useLocation();
+
+  const { data, isLoading, totalCount } = useBasket();
   console.log("basket total count from useBasket hook:", totalCount);
 
+  const basket = data?.basket;
+  if (isLoading) return <Typography>Loading...</Typography>;
+
+
   const subtotal =
-    basket.basketItems.reduce(
+    basket?.basketItems?.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     ) ?? 0;
 
-  const discount = 0;
   const deliveryFee = subtotal > 20000 ? 0 : 500;
 
   return (
@@ -63,16 +71,18 @@ export default function OrderSummary({ basket }) {
         </Box>
 
         <Box mt={2}>
-          <Button
-            component={Link}
-            to="/checkout"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mb: 1 }}
-          >
-            Checkout
-          </Button>
+          {!location.pathname.includes("/checkout") && (
+            <Button
+              component={Link}
+              to="/checkout"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mb: 1 }}
+            >
+              Checkout
+            </Button>
+          )}
           <Button component={Link} to="/products" fullWidth>
             Continue Shopping
           </Button>

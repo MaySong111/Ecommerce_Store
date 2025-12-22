@@ -9,7 +9,7 @@ export default function GuardAuth() {
   // and user does exists,it equals to token is null--becasue of zustand persist behavior
 
   const token = useAuthStore((state) => state.token);
-  console.log("GuardAuth - token:", token);
+  // console.log("GuardAuth - token:", token);
 
   if (!token) return <Navigate to="/login" replace />;
 

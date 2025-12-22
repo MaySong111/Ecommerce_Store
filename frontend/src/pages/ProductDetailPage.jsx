@@ -16,6 +16,7 @@ import useBasket from "../hooks/useBasket";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
+  // console.log("ProductDetailPage id:", id);
   const { product, isProductLoading } = useProducts(id);
   const { addBasketItemMutation } = useBasket();
   if (isProductLoading || !product) return <div>Loading...</div>;

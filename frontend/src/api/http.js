@@ -1,46 +1,30 @@
 // export const BASE_URL = "https://localhost:7207/api";
-export const BASE_URL = "http://localhost:5207/api";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
+// constant
+export const discount = 0;
+export const pageSize = 6;
 
 // product api--------------------------------------------------------------
+// GET /api/products?search=boot&sortBy=price&brands=Angular,Core
+export async function getProducts(filters = {}, pageSize, currentPage) {
+  const params = new URLSearchParams();
+  console.log("getProducts called with filters:", params.toString());
 
-export async function getProducts() {
-  var result = await fetch(`${BASE_URL}/products`);
-  return result.json();
+  if (filters.searchTerm) params.append("search", filters.searchTerm);
+  if (filters.sortBy) params.append("sortBy", filters.sortBy);
+  if (filters.brands?.length) params.append("brands", filters.brands.join(","));
+  if (filters.types?.length) params.append("types", filters.types.join(","));
+  if (pageSize) params.append("pageSize", pageSize);
+  if (currentPage) params.append("pageNumber", currentPage);
+
+  const url = `${BASE_URL}/products?${params.toString()}`;
+  const response = await fetch(url);
+  return response.json();
 }
 
 export async function getProduct(id) {
   var result = await fetch(`${BASE_URL}/products/${id}`);
-  return result.json();
-}
-
-export async function createProduct(product) {
-  var response = await fetch(`${BASE_URL}/products`, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-    body: JSON.stringify(product),
-  });
-
-  if (response.status === 401) {
-    const error = new Error("Unauthorized");
-    error.status = 401;
-    throw error;
-  }
-  return response.json();
-}
-
-export async function updateProduct(id, product) {
-  var result = await fetch(`${BASE_URL}/products/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(product),
-  });
-  if (!result.ok) {
-    throw new Error("Update failed");
-  }
   return result.json();
 }
 
@@ -137,4 +121,26 @@ export async function removeBasketItem({ productId }) {
     method: "DELETE",
   });
   return await result.json();
+}
+
+// order api--------------------------------------------------------------
+import { loadStripe } from "@stripe/stripe-js";
+
+export const stripePromise = loadStripe(
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+);
+
+//  frontend calls backend to create a payment intent with stripe
+export async function createPaymentIntent() {
+  const url = `${BASE_URL}/payments`;
+  var response = await fetch(url, {
+    credentials: "include",
+    method: "POST",
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+  return data;
 }

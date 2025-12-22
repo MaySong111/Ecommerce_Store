@@ -21,6 +21,7 @@ namespace WebApplication1.Core.Service
                     Currency = "aud",
                     PaymentMethodTypes = ["card"],
                 };
+                // invoke Stripe api (third party) to create a new (payment intent) object-发送请求到 Stripe
                 intent = await service.CreateAsync(options);
             }
             else
@@ -31,8 +32,20 @@ namespace WebApplication1.Core.Service
                 };
                 await service.UpdateAsync(basket.PaymentIntentId!, options);
             }
+
+            // return the payment intent object(Stripe 返回 PaymentIntent 对象)
             return intent;
         }
 
     }
 }
+
+
+// Stripe 返回什么是什么? paymentIntent 对象
+// intent = {
+//     Id: "pi_123abc",                     // 👈 PaymentIntentId（后端追踪用）
+//     ClientSecret: "pi_123abc_secret_xyz", // 👈 ClientSecret（前端用）
+//     Amount: 9500,
+//     Currency: "aud",
+//     Status: "requires_payment_method"     // 👈 状态：等待用户输入信用卡
+// }

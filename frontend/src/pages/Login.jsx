@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { useState } from "react";
-import useAccount from "../../hooks/useAccount";
+import useAccount from "../hooks/useAccount";
 
 export default function Login() {
   const { loginMutation } = useAccount();

@@ -1,18 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  createProduct,
-  getProduct,
-  getProducts,
-  updateProduct,
-} from "../api/http";
-import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
+import { getProduct, getProducts } from "../api/http";
 
-export function useProducts(id = null) {
-  const queryClient = useQueryClient();
-
-  const { data: products, isLoading: isProductsLoading } = useQuery({
-    queryKey: ["products"],
-    queryFn: getProducts,
+export function useProducts(
+  id = null,
+  filters = {},
+  pageSize = null,
+  currentPage = null
+) {
+  const { data, isLoading: isProductsLoading } = useQuery({
+    queryKey: ["products", filters, pageSize, currentPage],
+    queryFn: () => getProducts(filters, pageSize, currentPage),
   });
 
   const { data: product, isLoading: isProductLoading } = useQuery({
@@ -21,36 +18,10 @@ export function useProducts(id = null) {
     enabled: !!id,
   });
 
-  const createProductMutation = useMutation({
-    mutationFn: (p) => createProduct(p),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["products"]);
-      toast.success("Successfully created product!");
-    },
-    onError: (error) => {
-      console.error("Error creating product:", error);
-      toast.error("Failed to create product.");
-    },
-  });
-
-  const updateProductMutation = useMutation({
-    mutationFn: ({ id, product }) => updateProduct(id, product),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["products"]);
-      toast.success("Successfully updated product!");
-    },
-    onError: (error) => {
-      console.error("Error updating product:", error);
-      toast.error("Failed to update product.");
-    },
-  });
-
   return {
-    products,
+    data,
     product,
     isProductLoading,
     isProductsLoading,
-    createProduct: createProductMutation.mutate,
-    updateProduct: updateProductMutation.mutate,
   };
 }

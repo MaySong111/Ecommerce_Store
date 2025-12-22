@@ -13,7 +13,7 @@ const useAuthStore = create(
         set({ user: null, token: null });
       },
     }),
-    { name: "auth" }
+    { name: "ecommerceStore-Auth" }
   )
 );
 

@@ -8,7 +8,7 @@ import {
   Link,
 } from "@mui/material";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
-import useAccount from "../../hooks/useAccount";
+import useAccount from "../hooks/useAccount";
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
