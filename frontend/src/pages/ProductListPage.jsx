@@ -14,7 +14,8 @@ export default function ProductListPage() {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const handleChange = (event, value) => {
+  const handleChangeCurrentPage = (_, value) => {
+    // console.log("handleChangeCurrentPage value:", value);
     setCurrentPage(value);
   };
 
@@ -67,7 +68,7 @@ export default function ProductListPage() {
         <Pagination
           count={totalPages}
           page={currentPage}
-          onChange={handleChange}
+          onChange={handleChangeCurrentPage}
           color="secondary"
           sx={{ mt: 4, mx: "auto" }}
         />

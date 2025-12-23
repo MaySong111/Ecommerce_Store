@@ -12,6 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import PersonIcon from "@mui/icons-material/Person";
+import HistoryIcon from "@mui/icons-material/History";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import useBasket from "../hooks/useBasket";
@@ -71,7 +72,7 @@ export default function Navbar() {
           ))}
         </Box>
 
-        {/* 右侧登录 / 用户菜单 */}
+        {/* 右侧登录: 购物车icon + 用户菜单 */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 3, mr: 2 }}>
           {/* shopping cart */}
           <IconButton
@@ -137,6 +138,25 @@ export default function Navbar() {
                   >
                     <PersonIcon sx={{ mr: 1 }} /> My Profile
                   </Button>
+
+                  <Button
+                    component={Link}
+                    to={`/orders`}
+                    sx={{
+                      justifyContent: "flex-start",
+                      width: "100%",
+                      px: 2,
+                      py: 1.5,
+                      color: "text.primary",
+                      textTransform: "none",
+                      "&:hover": {
+                        bgcolor: "action.hover",
+                      },
+                    }}
+                  >
+                    <HistoryIcon sx={{ mr: 1 }} /> My Orders
+                  </Button>
+
                   <Button
                     onClick={() => {
                       logout();

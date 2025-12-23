@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { AddressElement, PaymentElement } from "@stripe/react-stripe-js";
 import { useState } from "react";
+import ReviewOrder from "./ReviewOrder";
 
 const steps = ["Address", "Payment", "Review"];
 
@@ -17,11 +18,15 @@ export default function CheckoutStepper() {
   const [activeStep, setActiveStep] = useState(0);
 
   const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    if (activeStep < steps.length - 1) {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    if (activeStep > 0) {
+      setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    }
   };
 
   return (
@@ -49,12 +54,23 @@ export default function CheckoutStepper() {
         </Box>
 
         <Box sx={{ display: activeStep === 2 ? "block" : "none" }}>
-          Review Order Details will go here
+          <ReviewOrder />
         </Box>
       </Box>
       <Box display="flex" justifyContent="space-between">
-        <Button onClick={handleBack}>Back</Button>
-        <Button onClick={handleNext}>Next</Button>
+        <Button onClick={handleBack} disabled={activeStep === 0}>
+          Back
+        </Button>
+
+        {/* when activeStep is last step, hide the Next button, because in review step we only show the order summary-pay button */}
+        {activeStep === steps.length - 1 ? null : (
+          <Button
+            onClick={handleNext}
+            disabled={activeStep === steps.length - 1}
+          >
+            Next
+          </Button>
+        )}
       </Box>
     </Paper>
   );

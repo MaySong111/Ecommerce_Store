@@ -11,24 +11,12 @@ import useBasket from "../hooks/useBasket";
 import { discount } from "../api/http";
 
 export default function OrderSummary() {
-
-
   const location = useLocation();
 
-  const { data, isLoading, totalCount } = useBasket();
+  const { isLoading, totalCount, subTotalPrice,totalPrice, deliveryFee } = useBasket();
   console.log("basket total count from useBasket hook:", totalCount);
 
-  const basket = data?.basket;
   if (isLoading) return <Typography>Loading...</Typography>;
-
-
-  const subtotal =
-    basket?.basketItems?.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    ) ?? 0;
-
-  const deliveryFee = subtotal > 20000 ? 0 : 500;
 
   return (
     <Box
@@ -48,13 +36,13 @@ export default function OrderSummary() {
         <Box mt={2}>
           <Box display="flex" justifyContent="space-between" mb={1}>
             <Typography color="textSecondary">Subtotal</Typography>
-            <Typography>${(subtotal / 100).toFixed(2)}</Typography>
+            <Typography>${(subTotalPrice / 100).toFixed(2)}</Typography>
           </Box>
 
           <Box display="flex" justifyContent="space-between" mb={1}>
             <Typography color="textSecondary">Discount</Typography>
             <Typography color="success">
-              ${(discount / 100).toFixed(2)}
+              -${(discount / 100).toFixed(2)}
             </Typography>
           </Box>
           <Box display="flex" justifyContent="space-between" mb={1}>
@@ -65,7 +53,7 @@ export default function OrderSummary() {
           <Box display="flex" justifyContent="space-between" mb={1}>
             <Typography color="textSecondary">Total</Typography>
             <Typography>
-              ${((subtotal + deliveryFee) / 100).toFixed(2)}
+              ${(totalPrice / 100).toFixed(2)}
             </Typography>
           </Box>
         </Box>

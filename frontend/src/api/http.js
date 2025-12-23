@@ -9,14 +9,13 @@ export const pageSize = 6;
 // GET /api/products?search=boot&sortBy=price&brands=Angular,Core
 export async function getProducts(filters = {}, pageSize, currentPage) {
   const params = new URLSearchParams();
-  console.log("getProducts called with filters:", params.toString());
 
   if (filters.searchTerm) params.append("search", filters.searchTerm);
   if (filters.sortBy) params.append("sortBy", filters.sortBy);
   if (filters.brands?.length) params.append("brands", filters.brands.join(","));
   if (filters.types?.length) params.append("types", filters.types.join(","));
   if (pageSize) params.append("pageSize", pageSize);
-  if (currentPage) params.append("pageNumber", currentPage);
+  if (currentPage) params.append("currentPage", currentPage);
 
   const url = `${BASE_URL}/products?${params.toString()}`;
   const response = await fetch(url);
@@ -74,10 +73,11 @@ export async function getBasket() {
   return result.json();
 }
 
-export async function addBasketItem({ productId }) {
+export async function addBasketItem({ productId, quantity = 1 }) {
   // console.log("addBasketItem called with:", productId);
-  const url = `${BASE_URL}/basket?productId=${productId}`;
+  const url = `${BASE_URL}/basket?productId=${productId}&quantity=${quantity}`;
   console.log("addBasketItem url:", url);
+
   var response = await fetch(url, {
     credentials: "include",
     headers: {
@@ -120,6 +120,20 @@ export async function removeBasketItem({ productId }) {
     },
     method: "DELETE",
   });
+  return await result.json();
+}
+
+export async function clearBasket() {
+  var result = await fetch(`${BASE_URL}/basket/clear`, {
+    credentials: "include",
+    method: "DELETE",
+  });
+  if (result.ok) {
+    // remove cookie
+    document.cookie =
+      "basketPublicId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  }
+
   return await result.json();
 }
 

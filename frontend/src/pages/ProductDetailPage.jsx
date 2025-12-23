@@ -13,12 +13,15 @@ import {
 } from "@mui/material";
 import { useProducts } from "../hooks/useProducts";
 import useBasket from "../hooks/useBasket";
+import { useState } from "react";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   // console.log("ProductDetailPage id:", id);
   const { product, isProductLoading } = useProducts(id);
-  const { addBasketItemMutation } = useBasket();
+  const { addBasketItemMutation, basket } = useBasket();
+  const [quantity, setQuantity] = useState(1);
+
   if (isProductLoading || !product) return <div>Loading...</div>;
 
   const productDetails = [
@@ -26,8 +29,23 @@ export default function ProductDetailPage() {
     { label: "Description", value: product.description },
     { label: "Type", value: product.type },
     { label: "Brand", value: product.brand },
-    { label: "Quantity in stock", value: product.quantityInStock },
   ];
+
+  // 一旦添加的数量超过库存，就不允许添加,按钮变灰--防止重复请求
+  // 1. 在发请求前, 先在前端验证
+  // 1.1 从购物车中找到该商品-如果没有那就是现在购物车中没有添加这个商品,itemInBasket.quantity要报错的因为找不到这个item在basket
+  const itemInBasket = basket?.basketItems?.find(
+    (item) => item.productId === product.id
+  );
+
+  // 1.2 获取剩余库存（优先用后端返回的，没有就前端直接算）
+  const remainingStock = itemInBasket
+    ? product.quantityInStock - itemInBasket.quantity
+    : product.quantityInStock;
+  console.log(remainingStock);
+
+  // 1.3 判断是否可以添加
+  const canAddMore = quantity <= remainingStock;
 
   return (
     <Grid2 container spacing={2} maxWidth="lg" sx={{ mx: "auto" }}>
@@ -70,10 +88,18 @@ export default function ProductDetailPage() {
             <TextField
               variant="outlined"
               type="number"
-              label="Quantity in cart"
+              label="Quantity"
               fullWidth
               defaultValue={1}
-              inputProps={{ min: 1, max: product.quantityInStock }}
+              inputProps={{ min: 1, max: remainingStock }}
+              onChange={(e) => setQuantity(parseInt(e.target.value))}
+              helperText={`Only ${remainingStock} left`}
+              FormHelperTextProps={{
+                sx: {
+                  color: "blue",
+                  fontSize: "12px",
+                },
+              }}
             />
           </Grid2>
           <Grid2 size={6}>
@@ -83,8 +109,12 @@ export default function ProductDetailPage() {
               color="primary"
               variant="contained"
               fullWidth
+              disabled={!canAddMore}
               onClick={() =>
-                addBasketItemMutation.mutate({ productId: product.id })
+                addBasketItemMutation.mutate({
+                  productId: product.id,
+                  quantity,
+                })
               }
             >
               Add to Cart

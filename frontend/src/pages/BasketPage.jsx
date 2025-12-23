@@ -4,9 +4,8 @@ import BasketItem from "../components/BasketItem";
 import OrderSummary from "../components/OrderSummary";
 
 export default function BasketPage() {
-  const { data, isLoading } = useBasket();
+  const { basket, isLoading } = useBasket();
   // console.log("basketPublicId, store in cookie:", data?.basketPublicId);
-  const basket = data?.basket;
   console.log("all items in basket,collection:", basket);
 
   if (isLoading) return <Typography>Loading...</Typography>;

@@ -5,19 +5,19 @@ namespace WebApplication1.Core.Entities
         public int Id { get; set; }
         public required string BasketPublicId { get; set; }
         public List<BasketItem> BasketItems { get; set; } = [];
-        public string?  ClientSecret { get; set; }
+        public string? ClientSecret { get; set; }
         public string? PaymentIntentId { get; set; }
-        
+
 
         // methods
         // +: add item      
-        public void AddItem(Product product)
+        public void AddItem(Product product, int quantity = 1)
         {
             var existingItem = BasketItems.FirstOrDefault(item => item.ProductId == product.Id);
             // if item exists, increase quantity
             if (existingItem != null)
             {
-                existingItem.Quantity += 1;
+                existingItem.Quantity += quantity;
                 // quantity in cart can not exceed product stock
                 if (existingItem.Quantity > product.QuantityInStock)
                 {
@@ -29,7 +29,7 @@ namespace WebApplication1.Core.Entities
             {
                 BasketItems.Add(new BasketItem
                 {
-                    Quantity = 1,
+                    Quantity = quantity,
                     ProductId = product.Id,
                     BasketId = this.Id,
                     Product = product

@@ -9,6 +9,7 @@ namespace WebApplication1.Core.Dtos
         public required string PictureUrl { get; set; }
         public required string Brand { get; set; }
         public required string Type { get; set; }
-
+        // every item has its own stock info
+        public int RemainingStock { get; set; }
     }
 }

@@ -75,7 +75,7 @@ export default function BasketItem({ item }) {
         </Box>
       </Box>
 
-      {/* --------------------------remove item */}
+      {/* --------------------------remove item-X icon */}
       <IconButton
         color="error"
         size="small"

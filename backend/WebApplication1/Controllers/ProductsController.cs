@@ -21,6 +21,7 @@ namespace WebApplication1.Controllers
             [FromQuery] string? types,
             [FromQuery] int pageSize = 6, [FromQuery] int currentPage = 1)
         {
+            Console.WriteLine($"GetProducts called with pageSize={pageSize}, currentPage={currentPage}, search={search}, sortBy={sortBy}, brands={brands}, types={types}");
             // frontend send: pageSize,CurrentPage,search,sortBy,brands
             // total items = count(items matching filter or no filter)
             // total pages = ceil(total items / pageSize)

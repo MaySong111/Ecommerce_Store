@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addBasketItem,
+  clearBasket,
   decreaseBasketItem,
   getBasket,
   removeBasketItem,
@@ -18,6 +19,14 @@ export default function useBasket() {
   const totalCount =
     data?.basket?.basketItems?.reduce((sum, item) => sum + item.quantity, 0) ||
     0;
+
+  const subTotalPrice =
+    data?.basket?.basketItems?.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    ) || 0;
+
+  const deliveryFee = subTotalPrice > 20000 ? 0 : 500;
 
   const addBasketItemMutation = useMutation({
     mutationFn: (item) => addBasketItem(item),
@@ -52,12 +61,24 @@ export default function useBasket() {
       toast.error("Failed to remove product.");
     },
   });
+
+  const clearBasketMutation = useMutation({
+    mutationFn: () => clearBasket(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["basket"]);
+    },
+  });
+
   return {
-    data,
+    basket: data?.basket,
     isLoading,
     totalCount,
+    subTotalPrice,
+    deliveryFee,
+    totalPrice: subTotalPrice + deliveryFee,
     addBasketItemMutation,
     decreaseBasketItemMutation,
     removeBasketItemMutation,
+    clearBasketMutation,
   };
 }
