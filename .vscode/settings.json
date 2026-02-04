@@ -1,3 +1,4 @@
 {
-  "dotnet.defaultSolution": "WebApplication1.sln"
+    "appService.defaultWebAppToDeploy": "/subscriptions/ce6a581a-8f8d-4e7c-9e1d-edfe67392ac4/resourceGroups/Ecommerce-store/providers/Microsoft.Web/sites/ecommerce-store",
+    "appService.deploySubpath": "backend/WebApplication1/Publish"
 }

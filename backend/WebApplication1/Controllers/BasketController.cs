@@ -11,6 +11,7 @@ namespace WebApplication1.Controllers
     [Route("api/[controller]")]
     public class BasketController(StoreContext _context, IMapper _mapper) : ControllerBase
     {
+        // get basket info
         [HttpGet]
         public async Task<ActionResult<BasketDto>> GetBasketInfo()
         {
@@ -37,7 +38,8 @@ namespace WebApplication1.Controllers
         }
 
 
-        [HttpPost]
+        // add item to basket, create basket if not exist
+        [HttpPost("add")]
         public async Task<ActionResult> AddItemToBasket([FromQuery] string productId, [FromQuery] int quantity = 1)
         {
             // 1.get basket
@@ -148,6 +150,65 @@ namespace WebApplication1.Controllers
         }
 
 
+        // buy again
+        [HttpPost("buy-again/{orderId}")]
+        public async Task<ActionResult<BasketDto>> BuyAgain([FromRoute] int orderId)
+        {
+            //  1.get basket
+            var basket = await GetBasket();
+            // 2.if basket not exist, create new one basket:create basket id cookie
+            if (basket == null)
+            {
+                basket = await CreateBasket();
+            }
+            // 3.get order by id
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+            // 4. check each order item stock
+            foreach (var item in order.OrderItems)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+                if (product == null)
+                {
+                    return NotFound(new BasketResponseDto
+                    {
+                        Message = $"Product with id {item.ProductId} not found"
+                    });
+                }
+                if (product.QuantityInStock < item.Quantity)
+                {
+                    return BadRequest(new BasketResponseDto
+                    {
+                        Message = $"Cannot add {item.Quantity} of {product.Name} to basket. Only {product.QuantityInStock} items left in stock."
+                    });
+                }
+                // also check existing quantity in basket
+                var existingItem = basket.BasketItems.FirstOrDefault(i => i.ProductId == item.ProductId);
+                var quantityInCart = existingItem?.Quantity ?? 0;
+                if (quantityInCart + item.Quantity > product.QuantityInStock)
+                {
+                    return BadRequest(new BasketResponseDto
+                    {
+                        Message = $"Cannot add {item.Quantity} of {product.Name} to basket. Only {product.QuantityInStock - quantityInCart} items left in stock."
+                    });
+                }
+                // 5. add order items to basket
+                basket.AddItem(product, item.Quantity);
+            }
+
+            // 6.save changes to db
+            await _context.SaveChangesAsync();
+            return Ok(new { Message = "Items added to basket successfully" });
+        }
+
+
+
         private async Task<Basket?> GetBasket()
         {
             var basket = await _context.Baskets
@@ -157,6 +218,7 @@ namespace WebApplication1.Controllers
             if (basket == null) return null;
             return basket;
         }
+
 
         private async Task<Basket> CreateBasket()
         {
@@ -168,7 +230,6 @@ namespace WebApplication1.Controllers
                 HttpOnly = false,
                 SameSite = SameSiteMode.Lax,  // 同域用Lax
                 Path = "/"
-
             };
             Response.Cookies.Append("basketPublicId", basketPublicId, cookieOptions);
             var basket = new Basket

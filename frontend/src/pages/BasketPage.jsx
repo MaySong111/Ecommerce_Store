@@ -6,7 +6,7 @@ import OrderSummary from "../components/OrderSummary";
 export default function BasketPage() {
   const { basket, isLoading } = useBasket();
   // console.log("basketPublicId, store in cookie:", data?.basketPublicId);
-  console.log("all items in basket,collection:", basket);
+  // console.log("all items in basket,collection:", basket);
 
   if (isLoading) return <Typography>Loading...</Typography>;
   if (basket.basketItems.length === 0)

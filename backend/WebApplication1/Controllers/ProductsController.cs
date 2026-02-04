@@ -27,7 +27,6 @@ namespace WebApplication1.Controllers
             // total pages = ceil(total items / pageSize)
 
             var query = _context.Products.AsQueryable();
-
             //1. filters
             if (!string.IsNullOrEmpty(search))
             {

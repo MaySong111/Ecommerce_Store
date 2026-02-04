@@ -16,22 +16,26 @@ public class JwtTokenCreator(UserManager<User> userManager, IConfiguration confi
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Role, "User"), // assuming a default role of "User"
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim("DisplayName", user.UserName)
+            new Claim(ClaimTypes.Name, user.UserName)
         };
 
         // step2: create signing credentials
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         // step3: create the token
-        var token = new JwtSecurityToken(
-            issuer: configuration["Jwt:Issuer"],
-            audience: configuration["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddHours(1),
-            signingCredentials: creds
-        );
+        var token = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.Now.AddHours(double.Parse(configuration["Jwt:expiryInHours"])),
+            SigningCredentials = creds,
+            Issuer = configuration["Jwt:Issuer"],
+            Audience = configuration["Jwt:Audience"]
+        };
+
         // step4: return the token string
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var securityToken = tokenHandler.CreateToken(token);
+        var tokenString = tokenHandler.WriteToken(securityToken);
         return tokenString;
     }
 }

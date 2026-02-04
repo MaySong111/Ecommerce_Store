@@ -27,7 +27,7 @@ export default function Login() {
       ...prevData,
       [name]: type === "checkbox" ? checked : value,
     }));
-    
+
     if (errors[name]) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -40,12 +40,15 @@ export default function Login() {
   const validate = () => {
     const newErrors = {};
     // check for empty fields
-    if (formData.email.trim() === "" || formData.password.trim() === "")
-      alert("Email and Password are required.");
+    if (formData.email.trim() === "" || formData.password.trim() === "") {
+      newErrors.email = "Email is required";
+      newErrors.password = "Password is required";
+    }
 
     // only check email format if email is not empty
-    if (formData.email.trim() && !formData.email.includes("@"))
+    if (formData.email.trim() && !formData.email.includes("@")) {
       newErrors.email = "Invalid email address";
+    }
     // only check password length if password is not empty
     if (formData.password.trim() && formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
@@ -59,10 +62,20 @@ export default function Login() {
 
     // only send login request if validation passes
     if (validate()) {
-      loginMutation.mutate({
-        email: formData.email,
-        password: formData.password,
-      });
+      loginMutation.mutate(
+        {
+          email: formData.email,
+          password: formData.password,
+        },
+        {
+          onError: (error) => {
+            // 后端错误显示
+            setErrors({
+              general: error.message || "Login failed",
+            });
+          },
+        },
+      );
     }
   };
 
@@ -102,6 +115,8 @@ export default function Login() {
             autoFocus
             value={formData.email}
             onChange={handleChange}
+            error={!!errors.email}
+            helperText={errors.email}
           />
           <TextField
             fullWidth
@@ -112,6 +127,8 @@ export default function Login() {
             autoComplete="current-password"
             value={formData.password}
             onChange={handleChange}
+            error={!!errors.password}
+            helperText={errors.password}
           />
           <Button
             type="submit"
@@ -127,6 +144,13 @@ export default function Login() {
               Sign up
             </Link>
           </Typography>
+
+          {/* 错误信息 */}
+          {loginMutation.isError && (
+            <Typography color="error" align="center" sx={{ mt: 1 }}>
+              {errors.general}
+            </Typography>
+          )}
         </Box>
       </Paper>
     </Container>

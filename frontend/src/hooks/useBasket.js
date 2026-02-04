@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addBasketItem,
-  clearBasket,
+  buyAgain,
   decreaseBasketItem,
   getBasket,
   removeBasketItem,
@@ -23,49 +23,51 @@ export default function useBasket() {
   const subTotalPrice =
     data?.basket?.basketItems?.reduce(
       (sum, item) => sum + item.price * item.quantity,
-      0
+      0,
     ) || 0;
 
-  const deliveryFee = subTotalPrice > 20000 ? 0 : 500;
+  const deliveryFee = subTotalPrice >= 50000 ? 0 : 500;
 
+  // add item to basket, create basket if not exist
   const addBasketItemMutation = useMutation({
-    mutationFn: (item) => addBasketItem(item),
+    mutationFn: addBasketItem,
     onSuccess: () => {
       queryClient.invalidateQueries(["basket"]);
     },
     onError: (error) => {
-      // console.error("Error adding product:", error);
+      toast.error(error.message);
+    },
+  });
+
+  // buy again mutations
+  const buyAgainMutation = useMutation({
+    mutationFn: buyAgain,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["basket"]);
+    },
+    onError: (error) => {
       toast.error(error.message);
     },
   });
 
   const decreaseBasketItemMutation = useMutation({
-    mutationFn: (item) => decreaseBasketItem(item),
+    mutationFn: decreaseBasketItem,
     onSuccess: () => {
       queryClient.invalidateQueries(["basket"]);
     },
     onError: (error) => {
-      console.error("Error decreasing product:", error);
-      toast.error("Failed to decrease product.");
+      toast.error(error.message);
     },
   });
 
   const removeBasketItemMutation = useMutation({
-    mutationFn: (item) => removeBasketItem(item),
+    mutationFn: removeBasketItem,
     onSuccess: () => {
       queryClient.invalidateQueries(["basket"]);
       toast.success("Successfully removed product!");
     },
     onError: (error) => {
-      console.error("Error removing product:", error);
-      toast.error("Failed to remove product.");
-    },
-  });
-
-  const clearBasketMutation = useMutation({
-    mutationFn: () => clearBasket(),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["basket"]);
+      toast.error(error.message);
     },
   });
 
@@ -77,8 +79,8 @@ export default function useBasket() {
     deliveryFee,
     totalPrice: subTotalPrice + deliveryFee,
     addBasketItemMutation,
+    buyAgainMutation,
     decreaseBasketItemMutation,
     removeBasketItemMutation,
-    clearBasketMutation,
   };
 }

@@ -1,141 +1,88 @@
 import {
   Box,
   Button,
-  Divider,
+  Typography,
   Table,
   TableBody,
-  TableCell,
-  TableContainer,
   TableRow,
-  Typography,
+  TableCell,
+  Divider,
 } from "@mui/material";
 import useBasket from "../hooks/useBasket";
-import { useElements, useStripe } from "@stripe/react-stripe-js";
-import { useEffect, useState } from "react";
 
-export default function ReviewOrder() {
-  console.log("ReviewOrder component rendered: 第一次渲染");
-  const { basket, totalPrice, clearBasketMutation } = useBasket();
-  const elements = useElements(); // store address info and card info from stripe elements
-  const [address, setAddress] = useState(null);
-
-  useEffect(() => {
-    const fetchAddress = async () => {
-      if (elements) {
-        const addressElement = elements.getElement("address");
-        if (addressElement) {
-          const addressData = await addressElement.getValue();
-          setAddress(addressData);
-        }
-      }
-    };
-    fetchAddress();
-  }, [elements]);
-  console.log("Address data object:", address);
-
-  // 2. click pay button to handle payment logic here
-  const stripe = useStripe();
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handPay = async () => {
-    if (!stripe || !elements) return;
-    setIsLoading(true);
-
-    // 调用 Stripe API
-    const { error } = await stripe.confirmPayment({
-      elements, // 包含地址和信用卡信息
-      confirmParams: {
-        return_url: "http://localhost:3000/orders", // 成功后跳转
-      },
-    });
-
-    if (error) {
-      console.error(error.message);
-      setIsLoading(false);
-    }
-    // clear basket after payment initiated
-    clearBasketMutation.mutate();
-  };
-
+export default function ReviewOrder({ stripeAddress, onPay, isLoading }) {
+  const { basket, totalPrice } = useBasket();
+  // console.log("ReviewOrder basket:", basket);
+  
   return (
-    <div>
-      <Box mt={4} width="100%">
-        <Typography variant="h6" fontWeight="bold">
-          Billing and Shipping Information
+    <Box>
+      {/* 显示地址 */}
+      <Typography variant="h6" fontWeight="bold">
+        Shipping Address
+      </Typography>
+      <Box mt={1}>
+        <Typography>{stripeAddress?.name}</Typography>
+        <Typography>{stripeAddress?.address?.line1}</Typography>
+        <Typography>
+          {stripeAddress?.address?.city}, {stripeAddress?.address?.state}{" "}
+          {stripeAddress?.address?.postal_code}
         </Typography>
-        <dl>
-          <Typography component="dt" variant="body1">
-            Shipping Address
-            <p>{address?.value?.name}</p>
-            <p>{address?.value?.address.line1}</p>
-            <p>
-              {address?.value?.address.city},{" "}
-              {address?.value?.address.postal_code}
-            </p>
-          </Typography>
-          <Typography component="dd" variant="body2">
-            address goes here
-          </Typography>
-
-          <Typography component="dt" variant="body1">
-            Payment Details
-          </Typography>
-          <Typography component="dd" variant="body2">
-            payment details go here
-          </Typography>
-        </dl>
+        <Typography>{stripeAddress?.address?.country}</Typography>
       </Box>
 
-      <Box mt={4} width="100%">
-        <Divider />
-        <TableContainer sx={{ mt: 2 }}>
-          <Table>
-            <TableBody>
-              {basket?.basketItems?.map((item) => (
-                <TableRow
-                  key={item.productId}
-                  sx={{ borderBottom: "1px solid rgba(224,224,224,1)" }}
-                >
-                  <TableCell sx={{ py: 4 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      <img
-                        src={item.pictureUrl}
-                        alt={item.name}
-                        style={{ width: 40, height: 40 }}
-                      />
-                      <Typography>{item.name}</Typography>
-                    </Box>
-                  </TableCell>
+      <Divider sx={{ my: 3 }} />
 
-                  <TableCell align="center" sx={{ py: 4 }}>
-                    <Typography>x {item.quantity}</Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <Typography>
-                      ${((item.price * item.quantity) / 100).toFixed(2)}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Divider />
+      {/* 显示商品 */}
+      <Typography variant="h6" fontWeight="bold">
+        Order Items
+      </Typography>
+      <Table>
+        <TableBody>
+          {basket?.basketItems?.map((item) => (
+            <TableRow key={item.productId}>
+              <TableCell>
+                <Box display="flex" alignItems="center" gap={2}>
+                  <img
+                    src={item.pictureUrl}
+                    alt={item.name}
+                    style={{ width: 50, height: 50, objectFit: "cover" }}
+                  />
+                  <Typography>{item.name}</Typography>
+                </Box>
+              </TableCell>
+              <TableCell align="center">x {item.quantity}</TableCell>
+              <TableCell align="right">
+                ${((item.price * item.quantity) / 100).toFixed(2)}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
-        {/* pay button   */}
-        <Box display="flex" justifyContent="flex-end" mt={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            disabled={isLoading || !stripe}
-            onClick={handPay}
-          >
-            {isLoading
-              ? "Processing..."
-              : `Pay $${(totalPrice / 100).toFixed(2)}`}
-          </Button>
-        </Box>
+      {/* <Divider sx={{ my: 3 }} /> */}
+
+      {/* 总价 */}
+      <Box display="flex" justifyContent="space-between" mb={2} mt={3}>
+        <Typography variant="h6">Total</Typography>
+        <Typography variant="h6" fontWeight="bold">
+          ${(totalPrice / 100).toFixed(2)}
+        </Typography>
       </Box>
-    </div>
+
+      {/* 支付按钮 */}
+      <Box display="flex" justifyContent="flex-end">
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          onClick={onPay}
+          disabled={isLoading}
+        >
+          {isLoading
+            ? "Processing..."
+            : `Pay $${(totalPrice / 100).toFixed(2)}`}
+        </Button>
+      </Box>
+    </Box>
   );
 }

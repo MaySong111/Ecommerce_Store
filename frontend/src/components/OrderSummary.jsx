@@ -13,8 +13,9 @@ import { discount } from "../api/http";
 export default function OrderSummary() {
   const location = useLocation();
 
-  const { isLoading, totalCount, subTotalPrice,totalPrice, deliveryFee } = useBasket();
-  console.log("basket total count from useBasket hook:", totalCount);
+  const { isLoading, subTotalPrice, totalPrice, deliveryFee } =
+    useBasket();
+  // console.log("basket total count from useBasket hook:", totalCount);
 
   if (isLoading) return <Typography>Loading...</Typography>;
 
@@ -31,7 +32,7 @@ export default function OrderSummary() {
           Order summary
         </Typography>
         <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-          Orders over $200 qualify for free delivery!
+          Orders over $500 qualify for free delivery!
         </Typography>
         <Box mt={2}>
           <Box display="flex" justifyContent="space-between" mb={1}>
@@ -52,9 +53,7 @@ export default function OrderSummary() {
           <Divider sx={{ my: 2 }} />
           <Box display="flex" justifyContent="space-between" mb={1}>
             <Typography color="textSecondary">Total</Typography>
-            <Typography>
-              ${(totalPrice / 100).toFixed(2)}
-            </Typography>
+            <Typography>${(totalPrice / 100).toFixed(2)}</Typography>
           </Box>
         </Box>
 

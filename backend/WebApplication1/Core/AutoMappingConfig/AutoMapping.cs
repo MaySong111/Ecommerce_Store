@@ -18,7 +18,9 @@ namespace WebApplication1.Core.AutoMappingConfig
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Product.Type))
             .ForMember(dest => dest.RemainingStock, opt => opt.MapFrom(src => src.Product.QuantityInStock - src.Quantity));
 
-
+            CreateMap<Order, OrderDto>();
+            CreateMap<OrderItem, OrderItemDto>();
         }
+
     }
 }

@@ -4,26 +4,30 @@ import { useProducts } from "../hooks/useProducts";
 import Filters from "../components/Filters";
 import { useState } from "react";
 import { pageSize } from "../api/http";
+import { useSearchParams } from "react-router-dom";
 
 export default function ProductListPage() {
-  const [filters, setFilters] = useState({
-    searchTerm: "",
+  const [options, setOptions] = useState({
     sortBy: "name",
     brands: [],
     types: [],
   });
-
   const [currentPage, setCurrentPage] = useState(1);
+  // read current query params
+  const [searchParams] = useSearchParams();
+  const searchTerm = searchParams.get("searchTerm") || "";
+
   const handleChangeCurrentPage = (_, value) => {
     // console.log("handleChangeCurrentPage value:", value);
     setCurrentPage(value);
   };
 
+
   const { data, isProductsLoading } = useProducts(
     null,
-    filters,
+    {...options, searchTerm},
     pageSize,
-    currentPage
+    currentPage,
   );
 
   const products = data?.products || [];
@@ -44,8 +48,8 @@ export default function ProductListPage() {
       <Grid2 size={3}>
         {showFilters && (
           <Filters
-            filters={filters}
-            setFilters={setFilters}
+            options={options}
+            setOptions={setOptions}
             products={products}
             brandList={brandList}
             typeList={typeList}

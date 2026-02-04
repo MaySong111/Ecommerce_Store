@@ -5,7 +5,7 @@ export function useProducts(
   id = null,
   filters = {},
   pageSize = null,
-  currentPage = null
+  currentPage = null,
 ) {
   const { data, isLoading: isProductsLoading } = useQuery({
     queryKey: ["products", filters, pageSize, currentPage],

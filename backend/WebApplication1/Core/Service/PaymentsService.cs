@@ -5,14 +5,16 @@ namespace WebApplication1.Core.Service
 {
     public class PaymentsService(IConfiguration configuration)
     {
-        public async Task<PaymentIntent> CreateOrUpdatePaymentIntent(Basket basket)
+        public async Task<PaymentIntent> CreateOrUpdatePaymentIntent(Basket basket, string userEmail)
         {
-            StripeConfiguration.ApiKey = configuration["StripeSettings:Secret key"];
+            StripeConfiguration.ApiKey = configuration["StripeSettings:Secretkey"];
             var service = new PaymentIntentService();
-            var intent = new PaymentIntent();
 
             var subtotal = basket.BasketItems.Sum(item => item.Quantity * item.Product.Price);
-            var deliveryFee = subtotal > 20000 ? 0 : 500;
+            var deliveryFee = subtotal >= 50000 ? 0 : 500;
+            // var intent = new PaymentIntent();
+            PaymentIntent intent;
+
             if (string.IsNullOrEmpty(basket.PaymentIntentId))
             {
                 var options = new PaymentIntentCreateOptions
@@ -20,6 +22,7 @@ namespace WebApplication1.Core.Service
                     Amount = subtotal + deliveryFee,
                     Currency = "aud",
                     PaymentMethodTypes = ["card"],
+                    ReceiptEmail = userEmail
                 };
                 // invoke Stripe api (third party) to create a new (payment intent) object-发送请求到 Stripe
                 intent = await service.CreateAsync(options);
@@ -28,9 +31,10 @@ namespace WebApplication1.Core.Service
             {
                 var options = new PaymentIntentUpdateOptions
                 {
-                    Amount = subtotal + deliveryFee
+                    Amount = subtotal + deliveryFee,
+                    ReceiptEmail = userEmail // 必须加上，确保更新时邮箱依然存在
                 };
-                await service.UpdateAsync(basket.PaymentIntentId!, options);
+                intent = await service.UpdateAsync(basket.PaymentIntentId!, options);
             }
 
             // return the payment intent object(Stripe 返回 PaymentIntent 对象)

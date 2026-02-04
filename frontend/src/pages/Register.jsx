@@ -10,16 +10,62 @@ import {
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import useAccount from "../hooks/useAccount";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function Register() {
   const { registerMutation } = useAccount();
   const navigate = useNavigate();
+  const [errors, setErrors] = useState({});
+
+  const validation = (data) => {
+    const newErrors = {};
+    if (!data.email) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(data.email))
+      newErrors.email = "Email is invalid";
+
+    if (!data.password) {
+      newErrors.password = "Password is required";
+    } else if (data.password.length < 6) {
+      newErrors.password = "At least 6 characters";
+    } else if (!/[A-Z]/.test(data.password)) {
+      newErrors.password = "Must contain uppercase letter";
+    } else if (!/[a-z]/.test(data.password)) {
+      newErrors.password = "Must contain lowercase letter";
+    } else if (!/[0-9]/.test(data.password)) {
+      newErrors.password = "Must contain number";
+    } else if (!/[^A-Za-z0-9]/.test(data.password)) {
+      newErrors.password = "Must contain special character";
+    }
+
+    if (!data.userName) newErrors.userName = "User name is required";
+    return newErrors;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    registerMutation.mutate({
+
+    const data = {
       email: formData.get("email"),
       password: formData.get("password"),
+      userName: formData.get("userName"),
+    };
+
+    const validationErrors = validation(data);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({});
+
+    registerMutation.mutate(data, {
+      onError: (error) => {
+        // 后端错误显示
+        setErrors({
+          general: error.message || "Registration failed",
+        });
+      },
     });
   };
 
@@ -50,7 +96,6 @@ export default function Register() {
         </Box>
 
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-         
           {/* Display name 字段 */}
           <TextField
             fullWidth
@@ -58,8 +103,10 @@ export default function Register() {
             name="userName"
             label="User name"
             autoComplete="username"
+            error={!!errors.userName}
+            helperText={errors.userName}
           />
-           {/* Email 字段 */}
+          {/* Email 字段 */}
           <TextField
             fullWidth
             margin="normal"
@@ -67,6 +114,8 @@ export default function Register() {
             label="Email"
             autoComplete="email"
             autoFocus
+            error={!!errors.email}
+            helperText={errors.email}
           />
           {/* Password 字段 */}
           <TextField
@@ -76,6 +125,8 @@ export default function Register() {
             label="Password"
             type="password"
             autoComplete="new-password"
+            error={!!errors.password}
+            helperText={errors.password}
           />
 
           <Button
@@ -104,7 +155,7 @@ export default function Register() {
           {/* 错误信息 */}
           {registerMutation.isError && (
             <Typography color="error" align="center" sx={{ mt: 1 }}>
-              register error
+              {errors.general}
             </Typography>
           )}
         </Box>

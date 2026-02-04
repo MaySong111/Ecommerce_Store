@@ -13,15 +13,12 @@ export default function useAccount() {
     mutationFn: loginUser,
     onSuccess: (result) => {
       // console.log("Login successful:", result);
+      toast.success(result.message || "Login successful");
       const { token, userInfo } = result;
       // store the token and user info
       login(userInfo, token);
       // redirect to activities page
       redirect("/products");
-    },
-    onError: (error) => {
-      console.error("Login failed:", error);
-      toast.error(error.message || "Login failed");
     },
   });
 
@@ -29,9 +26,6 @@ export default function useAccount() {
     mutationFn: registerUser,
     onSuccess: () => {
       redirect("/login");
-    },
-    onError: (error) => {
-      toast.error(error.message || "Registration failed");
     },
   });
 
