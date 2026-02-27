@@ -2,7 +2,7 @@
 
 A full-stack e-commerce web application for snowboard and winter sports equipment. Customers can browse products, manage a shopping cart, and complete checkout with Stripe payment integration.
 
-🔗 **Live Demo**: *(your Azure URL here)*
+🔗 **Live Demo**: https://ecommerce-store.azurewebsites.net/
 
 > **Test Account**
 >
